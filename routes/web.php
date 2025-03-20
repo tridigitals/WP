@@ -1,31 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
+use Inertia\Inertia;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Authentication Routes
-Route::middleware('guest')->group(function () {
-    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [LoginController::class, 'login']);
-});
-
-Route::post('logout', [LogoutController::class, 'logout'])
-    ->middleware('auth')
-    ->name('logout');
-
-// Admin Routes
-Route::middleware(['auth', 'admin'])->group(base_path('routes/admin.php'));
-
-// Redirect root to admin dashboard for authenticated users
 Route::get('/', function () {
-    return auth()->check() 
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('login');
+    return Inertia::render('welcome');
+})->name('home');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
 });
+
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
