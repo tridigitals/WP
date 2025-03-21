@@ -1,60 +1,169 @@
-## CMS Features
+# CMS Features Todo List
 
-1.  **Manajemen Konten**
+## 1. Database & Model Setup
+- [ ] Posts
+  - Title, content, excerpt, status, featured_image
+  - Timestamps, soft deletes
+  - Author relationship
+  - Category & tag relationships
+- [ ] Categories
+  - Name, slug, description
+  - Parent category relationship
+  - Posts relationship
+- [ ] Tags
+  - Name, slug
+  - Posts relationship
+- [ ] Users (extend existing)
+  - Role (admin/author)
+  - Profile fields
+  - Posts relationship
+- [ ] Media Library
+  - File path, name, type
+  - Alt text, caption
+  - Dimensions for images
+- [ ] Comments
+  - Content, author
+  - Post relationship
+  - Parent comment (for replies)
+- [ ] Menu Management
+  - Name, location
+  - Menu items structure
+- [ ] Settings/Options
+  - Key-value storage
+  - Group settings
 
-    *   Post & Page Management: CRUD untuk artikel, halaman, kategori, dan tag
-    *   WYSIWYG Editor (seperti TinyMCE/Quill.js)
-    *   Custom Post Types & Taxonomies
-    *   Draft, Publish, dan Scheduled Posts
+## 2. Backend Features
+### Authentication & Authorization
+- [ ] Role & Permission system
+- [ ] Admin middleware
+- [ ] User management
 
-2.  **Page Builder (Drag & Drop)**
+### Post Management
+- [ ] CRUD operations
+- [ ] Draft & publish workflow
+- [ ] Featured image handling
+- [ ] Rich text editor integration
+- [ ] Post meta handling
 
-    *   Layout Builder berbasis React dengan komponen drag-and-drop seperti Elementor
-    *   Komponen siap pakai: Header, Footer, Hero Section, Carousel, Button, Form, Image Gallery, dsb.
-    *   Grid System untuk desain responsif
-    *   Live Preview & Realtime Editing
-    *   Custom CSS dan Animasi Interaktif
+### Category & Tag Management
+- [ ] CRUD operations
+- [ ] Hierarchical categories
+- [ ] Slug generation
+- [ ] Post associations
 
-3.  **Manajemen Pengguna & Hak Akses**
+### Media Management
+- [ ] File upload system
+- [ ] Image optimization
+- [ ] Gallery management
+- [ ] File type validation
 
-    *   Multi-user roles (Admin, Editor, Author, Subscriber)
-    *   Role-based access control (RBAC)
-    *   Integrasi OAuth (Google, Facebook, GitHub, dsb.)
+### Menu Builder
+- [ ] Custom menu creation
+- [ ] Menu position management
+- [ ] Dynamic menu items
 
-4.  **Plugin & Extensibility**
+### Settings Management
+- [ ] Site settings
+- [ ] Theme options
+- [ ] SEO settings
 
-    *   Sistem Plugin untuk memperluas fungsionalitas CMS
-    *   API untuk pengembang pihak ketiga
-    *   Modul integrasi seperti Google Analytics, Mailchimp, Stripe/PayPal, dsb.
+## 3. Frontend Admin Panel (React)
+### Dashboard
+- [ ] Statistics overview
+- [ ] Recent content widgets
+- [ ] Quick draft feature
+- [ ] Activity log
 
-5.  **Manajemen Media & File**
+### Post Editor
+- [ ] Rich text editor integration
+- [ ] Media uploader
+- [ ] Category/tag selector
+- [ ] SEO metadata editor
+- [ ] Preview functionality
 
-    *   Media Library dengan drag-and-drop upload
-    *   Image Optimization (Lazy Loading, WebP support)
-    *   Video & Audio embedding
+### Media Library Interface
+- [ ] Grid/list view toggle
+- [ ] Drag & drop upload
+- [ ] Image editor
+- [ ] Bulk actions
+- [ ] Search & filter
 
-6.  **SEO & Optimasi Performa**
+### Menu Builder Interface
+- [ ] Drag & drop builder
+- [ ] Multiple menu locations
+- [ ] Custom link support
+- [ ] Menu item settings
 
-    *   Custom Meta Tags (title, description, keywords)
-    *   Sitemap.xml & Robots.txt generator
-    *   Schema Markup & OpenGraph integration
-    *   Caching & Lazy Loading
+### Settings Pages
+- [ ] General settings
+- [ ] User management
+- [ ] Theme customization
+- [ ] Plugin settings
 
-7.  **E-Commerce (Opsional)**
+## 4. Frontend Theme System
+### Core Components
+- [ ] Header customization
+- [ ] Footer management
+- [ ] Sidebar widgets
+- [ ] Archive templates
+- [ ] Single post template
 
-    *   Produk & Kategori Management
-    *   Shopping Cart & Checkout System
-    *   Payment Gateway (Stripe, Midtrans, PayPal)
-    *   Order & Customer Management
+### Widget System
+- [ ] Recent posts widget
+- [ ] Categories widget
+- [ ] Tags cloud widget
+- [ ] Custom widget support
 
-8.  **Multilingual & Localization**
+### Theme Customization
+- [ ] Color scheme settings
+- [ ] Typography options
+- [ ] Layout customization
+- [ ] Custom CSS support
 
-    *   Multi-language support dengan i18n
-    *   RTL (Right-to-Left) untuk bahasa seperti Arab
+## 5. Additional Features
+### SEO Tools
+- [ ] Meta tags management
+- [ ] Sitemap generation
+- [ ] Permalink settings
+- [ ] Social media integration
 
-9.  **Backup & Security**
+### API Development
+- [ ] RESTful endpoints
+- [ ] API authentication
+- [ ] Rate limiting
+- [ ] Documentation
 
-    *   Automatic Database Backup
-    *   Two-Factor Authentication (2FA)
-    *   Role-Based Permissions
-    *   Protection dari SQL Injection, XSS, dan CSRF
+### Performance
+- [ ] Caching system
+- [ ] Image optimization
+- [ ] Lazy loading
+- [ ] Database optimization
+
+### Security
+- [ ] CSRF protection
+- [ ] XSS prevention
+- [ ] Input validation
+- [ ] Role-based access control
+
+## 6. Testing & Documentation
+### Testing
+- [ ] Unit tests
+- [ ] Feature tests
+- [ ] API tests
+- [ ] Performance testing
+- [ ] Security testing
+
+### Documentation
+- [ ] API documentation
+- [ ] User manual
+- [ ] Developer guide
+- [ ] Deployment guide
+
+## Priority Order
+1. Basic Model & Database Setup
+2. Authentication & Core Admin Features
+3. Post Management System
+4. Media Library
+5. Theme System
+6. Additional Features
+7. Testing & Documentation
