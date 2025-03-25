@@ -11,19 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('set null');
             $table->timestamps();
-        });
-
-        // Create pivot table for posts and tags
-        Schema::create('post_tag', function (Blueprint $table) {
-            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
-            $table->primary(['post_id', 'tag_id']);
+            $table->softDeletes();
         });
     }
 
@@ -32,7 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_tag');
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('categories');
     }
 };

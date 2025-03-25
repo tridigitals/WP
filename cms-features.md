@@ -1,42 +1,48 @@
 # CMS Features Todo List
 
+Gunakan editor text free yang tidak menggunakan limitasi sama sekali
+Gunakan page builder dengan fitur seperti di elementor
+tambahkan unit test di setiap fitur
+
 ## 1. Database & Model Setup
-- [ ] Posts
+- [x] Posts
   - Title, content, excerpt, status, featured_image
-  - Timestamps, soft deletes
+  - Timestamps, soft deletes (trash)
   - Author relationship
   - Category & tag relationships
-- [ ] Categories
+- [x] Categories
   - Name, slug, description
   - Parent category relationship
   - Posts relationship
-- [ ] Tags
+- [x] Tags
   - Name, slug
   - Posts relationship
-- [ ] Users (extend existing)
+- [x] Users (extend existing)
   - Role (admin/author)
   - Profile fields
   - Posts relationship
-- [ ] Media Library
+- [x] Media Library
   - File path, name, type
   - Alt text, caption
   - Dimensions for images
-- [ ] Comments
+- [x] Comments
   - Content, author
   - Post relationship
   - Parent comment (for replies)
-- [ ] Menu Management
+- [x] Menu Management
   - Name, location
   - Menu items structure
-- [ ] Settings/Options
+- [x] Settings/Options
   - Key-value storage
   - Group settings
 
 ## 2. Backend Features
 ### Authentication & Authorization
-- [ ] Role & Permission system
+- [ ] RBAC dengan spatie permission
 - [ ] Admin middleware
 - [ ] User management
+- [ ] Role management
+- [ ] Permission management
 
 ### Post Management
 - [ ] CRUD operations

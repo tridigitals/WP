@@ -15,15 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->text('content');
+            $table->longText('content');
             $table->text('excerpt')->nullable();
+            $table->string('status')->default('draft'); // draft, published, private
             $table->string('featured_image')->nullable();
-            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
+            $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->timestamp('published_at')->nullable();
-            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
-            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            // Add fulltext index for search
+            $table->fullText(['title', 'content', 'excerpt']);
         });
     }
 

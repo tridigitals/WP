@@ -4,64 +4,43 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
 class Post extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<string>
+     */
     protected $fillable = [
         'title',
         'slug',
         'content',
         'excerpt',
-        'featured_image',
         'status',
-        'published_at',
+        'featured_image',
         'author_id',
-        'category_id',
-        'meta'
+        'published_at'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'published_at' => 'datetime',
-        'meta' => 'array',
     ];
 
-    // Relationships
-    public function author()
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
     {
-        return $this->belongsTo(User::class, 'author_id');
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class);
-    }
-
-    // Scopes
-    public function scopePublished($query)
-    {
-        return $query->where('status', 'published')
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now());
-    }
-
-    public function scopeDraft($query)
-    {
-        return $query->where('status', 'draft');
-    }
-
-    // Methods
-    public static function boot()
-    {
-        parent::boot();
-        
         static::creating(function ($post) {
             if (empty($post->slug)) {
                 $post->slug = Str::slug($post->title);
@@ -69,12 +48,86 @@ class Post extends Model
         });
     }
 
-    public function getExcerptAttribute($value)
+    /**
+     * Get the author of the post.
+     */
+    public function author()
     {
-        if (!empty($value)) {
-            return $value;
-        }
-        
-        return Str::limit(strip_tags($this->content), 150);
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the categories for the post.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    /**
+     * Get the tags for the post.
+     */
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    /**
+     * Get the comments for the post.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Scope a query to only include published posts.
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published')
+                    ->where('published_at', '<=', now());
+    }
+
+    /**
+     * Scope a query to only include draft posts.
+     */
+    public function scopeDraft($query)
+    {
+        return $query->where('status', 'draft');
+    }
+
+    /**
+     * Scope a query to only include posts with a specific status.
+     */
+    public function scopeStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Get the post's comments count.
+     */
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
+
+    /**
+     * Get the URL to the post.
+     */
+    public function getUrlAttribute()
+    {
+        return url("/posts/{$this->slug}");
+    }
+
+    /**
+     * Check if the post is published.
+     */
+    public function isPublished(): bool
+    {
+        return $this->status === 'published' &&
+               $this->published_at !== null &&
+               $this->published_at <= now();
     }
 }
