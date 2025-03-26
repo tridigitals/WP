@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
         // Create posts last as they depend on users, categories, and tags
         $this->call(PostSeeder::class);
 
+        // Create roles and permissions
+        $this->call(RolesAndPermissionsSeeder::class);
+
         // Create default settings
         $this->createDefaultSettings();
     }
