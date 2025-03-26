@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/lib/utils';
@@ -54,6 +54,14 @@ export function AppSidebar() {
             title: 'Permission Management',
             href: '/admin/permissions',
             icon: Key,
+        });
+    }
+
+    if (hasPermission(user, 'view tags')) {
+        mainNavItems.push({
+            title: 'Tag Management',
+            href: '/admin/tags',
+            icon: TagIcon,
         });
     }
 

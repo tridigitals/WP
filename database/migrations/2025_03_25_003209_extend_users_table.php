@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('author');
             $table->text('bio')->nullable();
             $table->string('avatar')->nullable();
             $table->string('website')->nullable();
@@ -28,7 +27,6 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
-                'role',
                 'bio',
                 'avatar',
                 'website',

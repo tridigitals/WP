@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,6 +34,8 @@ class DatabaseSeeder extends Seeder
      */
     private function createDefaultSettings(): void
     {
+        \App\Models\Setting::query()->delete();
+
         $settings = [
             // General settings
             ['group' => 'general', 'key' => 'site_name', 'value' => 'Laravel React CMS', 'type' => 'string', 'is_autoload' => true],

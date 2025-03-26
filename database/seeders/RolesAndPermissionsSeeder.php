@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -12,6 +13,15 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Truncate tables
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        DB::table('role_has_permissions')->truncate();
+        DB::table('model_has_roles')->truncate();
+        DB::table('model_has_permissions')->truncate();
+        DB::table('roles')->truncate();
+        DB::table('permissions')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         // Create permissions
         $permissions = [
@@ -47,6 +57,12 @@ class RolesAndPermissionsSeeder extends Seeder
             // Comment management
             'moderate comments',
             'delete comments',
+
+            // Tag management
+            'view tags',
+            'create tags',
+            'edit tags',
+            'delete tags',
         ];
 
         foreach ($permissions as $permission) {
@@ -76,6 +92,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete media',
             'moderate comments',
             'delete comments',
+            'view tags',
+            'create tags',
+            'edit tags',
+            'delete tags',
         ]);
 
         // Editor
@@ -87,6 +107,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'publish posts',
             'upload media',
             'moderate comments',
+            'view tags',
         ]);
 
         // Author
@@ -96,6 +117,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'create posts',
             'edit posts',
             'upload media',
+            'view tags',
         ]);
 
         // Update the existing admin user to super-admin

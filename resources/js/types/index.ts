@@ -1,8 +1,15 @@
 import { Page } from '@inertiajs/core';
+import { type LucideIcon } from 'lucide-react';
 
 export interface BreadcrumbItem {
   title: string;
   href: string;
+}
+
+export interface NavItem {
+  title: string;
+  href: string;
+  icon: LucideIcon;
 }
 
 export type PageProps = {
@@ -30,6 +37,15 @@ export interface User {
   updated_at: string;
 }
 
+export interface Tag {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Role {
   id: number;
   name: string;
@@ -43,4 +59,11 @@ export interface Permission {
   name: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface Column<T> {
+  key: keyof T | 'actions';
+  label: string;
+  sortable?: boolean;
+  render?: (item: T) => React.ReactNode;
 }
