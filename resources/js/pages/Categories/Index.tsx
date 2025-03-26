@@ -37,6 +37,16 @@ export default function Categories({ categories, filters }: Props) {
       sortable: true,
     },
     {
+      key: 'description' as const,
+      label: 'Description',
+      render: (category: Category) => category.description || '-',
+    },
+    {
+      key: 'parent' as const,
+      label: 'Parent Category',
+      render: (category: Category) => category.parent?.name || '-',
+    },
+    {
       key: 'slug' as const,
       label: 'Slug',
       sortable: true,

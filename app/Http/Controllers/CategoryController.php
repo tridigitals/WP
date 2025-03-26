@@ -16,6 +16,7 @@ class CategoryController extends Controller
     {
         return Inertia::render('Categories/Index', [
             'categories' => Category::query()
+                ->with('parent')
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('name', 'like', "%{$search}%");
                 })
@@ -30,7 +31,9 @@ class CategoryController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Categories/Create');
+        return Inertia::render('Categories/Create', [
+            'categories' => Category::all(['id', 'name']),
+        ]);
     }
 
     /**
@@ -41,6 +44,8 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories',
             'slug' => 'required|string|max:255|unique:categories',
+            'description' => 'nullable|string',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
         Category::create($validated);
@@ -54,6 +59,8 @@ class CategoryController extends Controller
      */
     public function show(Category $category): Response
     {
+        $category->load('parent');
+        
         return Inertia::render('Categories/Show', [
             'category' => $category,
         ]);
@@ -66,6 +73,8 @@ class CategoryController extends Controller
     {
         return Inertia::render('Categories/Edit', [
             'category' => $category,
+            'categories' => Category::where('id', '!=', $category->id)
+                ->get(['id', 'name']),
         ]);
     }
 
@@ -77,6 +86,8 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
+            'description' => 'nullable|string',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
         $category->update($validated);
@@ -90,6 +101,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        // Update children to have no parent
+        $category->children()->update(['parent_id' => null]);
+        
         $category->delete();
 
         return redirect()->route('admin.categories.index')

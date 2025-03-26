@@ -2,7 +2,11 @@ import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, Category } from '@/types';
+
+interface Props {
+  categories: Pick<Category, 'id' | 'name'>[];
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -19,10 +23,12 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function CreateCategory() {
+export default function CreateCategory({ categories }: Props) {
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     slug: '',
+    description: '',
+    parent_id: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -92,6 +98,42 @@ export default function CreateCategory() {
                   />
                   {errors.slug && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.slug}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    rows={3}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                    value={data.description}
+                    onChange={e => setData('description', e.target.value)}
+                  />
+                  {errors.description && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="parent_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Parent Category
+                  </label>
+                  <select
+                    id="parent_id"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                    value={data.parent_id}
+                    onChange={e => setData('parent_id', e.target.value)}
+                  >
+                    <option value="">None</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.parent_id && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.parent_id}</p>
                   )}
                 </div>
               </div>

@@ -10,6 +10,7 @@ export interface NavItem {
   title: string;
   href: string;
   icon: LucideIcon;
+  children?: NavItem[];
 }
 
 export type PageProps = {
@@ -65,6 +66,10 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
+  description: string | null;
+  parent_id: number | null;
+  parent?: Category;
+  children?: Category[];
   created_at: string;
   updated_at: string;
 }

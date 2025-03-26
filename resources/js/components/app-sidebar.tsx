@@ -4,8 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon } from 'lucide-react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon, Settings } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/lib/utils';
@@ -34,43 +33,60 @@ export function AppSidebar() {
         },
     ];
 
+    // Add User Management section with nested items
     if (hasPermission(user, 'view users')) {
+        const userManagementChildren: NavItem[] = [];
+        
+        if (hasPermission(user, 'view users')) {
+            userManagementChildren.push({
+                title: 'User Management',
+                href: '/admin/users',
+                icon: Users,
+            });
+        }
+        // Add Role Management if user has permission
+        if (hasPermission(user, 'view roles')) {
+            userManagementChildren.push({
+                title: 'Role Management',
+                href: '/admin/roles',
+                icon: Shield,
+            });
+        }
+
+        // Add Permission Management if user has permission
+        if (hasPermission(user, 'view permissions')) {
+            userManagementChildren.push({
+                title: 'Permission Management',
+                href: '/admin/permissions',
+                icon: Key,
+            });
+        }
+
+
+        // Add User Management section with children
         mainNavItems.push({
             title: 'User Management',
-            href: '/admin/users',
+            href: '#',
             icon: Users,
+            children: userManagementChildren,
         });
     }
 
-    if (hasPermission(user, 'view roles')) {
+    // Add Category Management if user has permission
+    if (hasPermission(user, 'view categories')) {
         mainNavItems.push({
-            title: 'Role Management',
-            href: '/admin/roles',
-            icon: Shield,
+            title: 'Category Management',
+            href: '/admin/categories',
+            icon: Settings,
         });
     }
 
-    if (hasPermission(user, 'view permissions')) {
-        mainNavItems.push({
-            title: 'Permission Management',
-            href: '/admin/permissions',
-            icon: Key,
-        });
-    }
-
+    // Add Tag Management as a separate section
     if (hasPermission(user, 'view tags')) {
         mainNavItems.push({
             title: 'Tag Management',
             href: '/admin/tags',
             icon: TagIcon,
-        });
-    }
-
-    if (hasPermission(user, 'view categories')) {
-        mainNavItems.push({
-            title: 'Category Management',
-            href: '/admin/categories',
-            icon: ChevronDownIcon,
         });
     }
 

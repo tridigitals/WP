@@ -56,10 +56,18 @@ export default function ShowCategory({ category }: Props) {
                 <dd className="mt-1 text-sm text-gray-900 dark:text-gray-200">{category.slug}</dd>
               </div>
               <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Parent Category</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-200">{category.parent?.name || 'None'}</dd>
+              </div>
+              <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Created At</dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-gray-200">
                   {new Date(category.created_at).toLocaleDateString()}
                 </dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-200">{category.description || 'No description'}</dd>
               </div>
             </dl>
           </div>
