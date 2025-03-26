@@ -38,11 +38,11 @@ tambahkan unit test di setiap fitur
 
 ## 2. Backend Features
 ### Authentication & Authorization
-- [ ] RBAC dengan spatie permission
-- [ ] Admin middleware
-- [ ] User management
-- [ ] Role management
-- [ ] Permission management
+- [x] RBAC dengan spatie permission
+- [x] Admin middleware
+- [x] User management
+- [x] Role management
+- [x] Permission management
 
 ### Post Management
 - [ ] CRUD operations

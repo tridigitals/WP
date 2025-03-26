@@ -25,6 +25,7 @@ export interface User {
   website: string | null;
   social_media_links: Record<string, string>;
   roles: Role[];
+  permissions: Permission[];
   created_at: string;
   updated_at: string;
 }

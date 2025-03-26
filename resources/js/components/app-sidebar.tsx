@@ -2,33 +2,12 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Users, Shield, Key } from 'lucide-react';
 import AppLogo from './app-logo';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'User Management',
-        href: '/admin/users',
-        icon: Users,
-    },
-    {
-        title: 'Role Management',
-        href: '/admin/roles',
-        icon: Shield,
-    },
-    {
-        title: 'Permission Management',
-        href: '/admin/permissions',
-        icon: Key,
-    },
-];
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/lib/utils';
 
 const footerNavItems: NavItem[] = [
     {
@@ -44,6 +23,40 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { user } = useAuth();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (hasPermission(user, 'view users')) {
+        mainNavItems.push({
+            title: 'User Management',
+            href: '/admin/users',
+            icon: Users,
+        });
+    }
+
+    if (hasPermission(user, 'view roles')) {
+        mainNavItems.push({
+            title: 'Role Management',
+            href: '/admin/roles',
+            icon: Shield,
+        });
+    }
+
+    if (hasPermission(user, 'view permissions')) {
+        mainNavItems.push({
+            title: 'Permission Management',
+            href: '/admin/permissions',
+            icon: Key,
+        });
+    }
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
