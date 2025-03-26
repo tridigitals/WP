@@ -61,6 +61,14 @@ export interface Permission {
   updated_at: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Column<T> {
   key: keyof T | 'actions';
   label: string;

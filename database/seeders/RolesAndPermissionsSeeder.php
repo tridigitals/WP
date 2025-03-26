@@ -58,11 +58,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'moderate comments',
             'delete comments',
 
-            // Tag management
+            // Category & Tag management
             'view tags',
             'create tags',
             'edit tags',
             'delete tags',
+            'view categories',
+            'create categories',
+            'edit categories',
+            'delete categories',
         ];
 
         foreach ($permissions as $permission) {
@@ -108,6 +112,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'upload media',
             'moderate comments',
             'view tags',
+            'create tags',
+            'edit tags',
+            'view categories',
+            'create categories',
+            'edit categories',
         ]);
 
         // Author
@@ -118,6 +127,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit posts',
             'upload media',
             'view tags',
+            'create tags',
+            'delete tags',
+            'edit tags',
+            'view categories',
+            'create categories',
+            'edit categories',
+            'delete categories',
+
         ]);
 
         // Update the existing admin user to super-admin

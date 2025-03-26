@@ -18,4 +18,5 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Tag Management
     Route::resource('tags', TagController::class);
+    Route::resource('categories', \App\Http\Controllers\CategoryController::class);
 });

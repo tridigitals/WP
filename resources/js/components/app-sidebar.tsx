@@ -5,6 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon } from 'lucide-react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import AppLogo from './app-logo';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/lib/utils';
@@ -62,6 +63,14 @@ export function AppSidebar() {
             title: 'Tag Management',
             href: '/admin/tags',
             icon: TagIcon,
+        });
+    }
+
+    if (hasPermission(user, 'view categories')) {
+        mainNavItems.push({
+            title: 'Category Management',
+            href: '/admin/categories',
+            icon: ChevronDownIcon,
         });
     }
 
