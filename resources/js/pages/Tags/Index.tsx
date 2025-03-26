@@ -2,7 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Tag, BreadcrumbItem, type Column } from '@/types';
+import { Tag, BreadcrumbItem } from '@/types';
 import { DataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/data-table';
 
 interface Props {
@@ -30,25 +30,30 @@ export default function Tags({ tags, filters }: Props) {
     }
   };
 
-  const columns: Column<Tag>[] = [
+  const columns = [
     {
-      key: 'name',
+      key: 'name' as const,
       label: 'Name',
       sortable: true,
     },
     {
-      key: 'description',
+      key: 'description' as const,
       label: 'Description',
-      sortable: false,
+      render: (tag: Tag) => tag.description || '-',
     },
     {
-      key: 'created_at',
+      key: 'slug' as const,
+      label: 'Slug',
+      sortable: true,
+    },
+    {
+      key: 'created_at' as const,
       label: 'Created At',
       sortable: true,
       render: (tag: Tag) => new Date(tag.created_at).toLocaleDateString(),
     },
     {
-      key: 'actions',
+      key: 'actions' as const,
       label: 'Actions',
       render: (tag: Tag) => (
         <div className="flex justify-end gap-2">
@@ -67,13 +72,14 @@ export default function Tags({ tags, filters }: Props) {
             size="sm"
             onClick={() => handleDelete(tag)}
             disabled={processing}
-            className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400">
+            className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+          >
             Delete
           </Button>
         </div>
       ),
     },
-  ];
+  ] as const;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

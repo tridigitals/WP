@@ -26,11 +26,11 @@ export default function Roles({ roles, filters }: Props) {
 
   const handleDelete = (role: Role) => {
     if (role.name === 'super-admin') {
-      alert('Super Admin role cannot be deleted');
+      alert('Cannot delete super-admin role.');
       return;
     }
-
-    if (confirm('Are you sure you want to delete this role?')) {
+    
+    if (confirm(`Are you sure you want to delete the role "${role.name}"?`)) {
       destroy(route('admin.roles.destroy', role.id));
     }
   };
@@ -45,15 +45,10 @@ export default function Roles({ roles, filters }: Props) {
       key: 'permissions' as const,
       label: 'Permissions',
       render: (role: Role) => (
-        <div className="flex flex-wrap gap-1">
-          {role.permissions.map((permission) => (
-            <span
-              key={permission.id}
-              className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30"
-            >
-              {permission.name}
-            </span>
-          ))}
+        <div className="max-w-md overflow-hidden">
+          <p className="truncate">
+            {role.permissions.map(p => p.name).join(', ')}
+          </p>
         </div>
       ),
     },
@@ -73,24 +68,20 @@ export default function Roles({ roles, filters }: Props) {
               View
             </Button>
           </Link>
-          {role.name !== 'super-admin' && (
-            <>
-              <Link href={route('admin.roles.edit', role.id)}>
-                <Button variant="outline" size="sm">
-                  Edit
-                </Button>
-              </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleDelete(role)}
-                disabled={processing}
-                className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
-              >
-                Delete
-              </Button>
-            </>
-          )}
+          <Link href={route('admin.roles.edit', role.id)}>
+            <Button variant="outline" size="sm">
+              Edit
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(role)}
+            disabled={processing || role.name === 'super-admin'}
+            className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+          >
+            Delete
+          </Button>
         </div>
       ),
     },

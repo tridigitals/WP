@@ -36,6 +36,7 @@ export interface User {
   permissions: Permission[];
   created_at: string;
   updated_at: string;
+  hasRole: (role: string) => boolean;
 }
 
 export interface Tag {

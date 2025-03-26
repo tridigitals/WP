@@ -2,6 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
 export type Column<T> = {
   key: keyof T | 'actions';
@@ -66,8 +67,12 @@ export function DataTable<T>({
   };
 
   const getSortIcon = (key: string) => {
-    if (filters.sort !== key) return '↕️';
-    return filters.direction === 'asc' ? '↑' : '↓';
+    if (filters.sort !== key) {
+      return <ChevronsUpDown className="h-4 w-4 text-gray-400" />;
+    }
+    return filters.direction === 'asc' 
+      ? <ChevronUp className="h-4 w-4 text-primary" />
+      : <ChevronDown className="h-4 w-4 text-primary" />;
   };
 
   return (
@@ -77,12 +82,12 @@ export function DataTable<T>({
           <input
             type="text"
             placeholder="Search..."
-            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            className="h-9 w-[150px] lg:w-[250px] rounded-md border-gray-300 px-3 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
             defaultValue={filters.search}
             onChange={(e) => handleSearch(e.target.value)}
           />
           <select
-            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            className="h-9 rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
             value={filters.per_page}
             onChange={handlePerPageChange}
           >
@@ -105,13 +110,13 @@ export function DataTable<T>({
                 {columns.map((column) => (
                   <TableHead 
                     key={String(column.key)}
-                    className={column.sortable ? 'cursor-pointer select-none' : ''}
+                    className={column.sortable ? 'cursor-pointer select-none hover:bg-accent/50' : ''}
                     onClick={() => column.sortable && handleSort(String(column.key))}
                   >
                     <div className="flex items-center gap-2">
                       {column.label}
                       {column.sortable && (
-                        <span className="text-xs">{getSortIcon(String(column.key))}</span>
+                        <span className="inline-flex">{getSortIcon(String(column.key))}</span>
                       )}
                     </div>
                   </TableHead>
@@ -134,7 +139,7 @@ export function DataTable<T>({
               ))}
               {data.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="text-center py-4 text-gray-500 dark:text-gray-400">
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500 dark:text-gray-400">
                     No records found
                   </TableCell>
                 </TableRow>

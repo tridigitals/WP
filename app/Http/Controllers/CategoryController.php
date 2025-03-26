@@ -20,9 +20,19 @@ class CategoryController extends Controller
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('name', 'like', "%{$search}%");
                 })
-                ->paginate(10)
+                ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
+                    $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
+                }, function ($query) {
+                    $query->orderBy('created_at', 'desc');
+                })
+                ->paginate($request->input('per_page', 10))
                 ->withQueryString(),
-            'filters' => $request->all(),
+            'filters' => [
+                'search' => $request->input('search'),
+                'sort' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+                'per_page' => $request->input('per_page', 10),
+            ],
         ]);
     }
 

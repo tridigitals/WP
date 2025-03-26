@@ -17,8 +17,8 @@ class PermissionController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
-            ->when($request->sort, function ($query, $sort) {
-                $query->orderBy($sort, $request->direction ?? 'asc');
+            ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
+                $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
             }, function ($query) {
                 $query->orderBy('name');
             });
@@ -26,7 +26,12 @@ class PermissionController extends Controller
         return Inertia::render('Permissions/Index', [
             'permissions' => $query->paginate($request->input('per_page', 10))
                 ->withQueryString(),
-            'filters' => $request->only(['search', 'sort', 'direction', 'per_page'])
+            'filters' => [
+                'search' => $request->input('search'),
+                'sort' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+                'per_page' => $request->input('per_page', 10),
+            ]
         ]);
     }
 

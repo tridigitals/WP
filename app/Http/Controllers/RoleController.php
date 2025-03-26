@@ -4,117 +4,115 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
+use Inertia\Response;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): Response
     {
-        $this->authorize('view roles');
-        
-        $query = Role::with('permissions')
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->when($request->sort, function ($query, $sort) {
-                $query->orderBy($sort, $request->direction ?? 'asc');
-            }, function ($query) {
-                $query->orderBy('name');
-            });
-
         return Inertia::render('Roles/Index', [
-            'roles' => $query->paginate($request->input('per_page', 10))
+            'roles' => Role::query()
+                ->with('permissions')
+                ->when($request->input('search'), function ($query, $search) {
+                    $query->where('name', 'like', "%{$search}%");
+                })
+                ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
+                    $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
+                }, function ($query) {
+                    $query->orderBy('created_at', 'desc');
+                })
+                ->paginate($request->input('per_page', 10))
                 ->withQueryString(),
-            'filters' => $request->only(['search', 'sort', 'direction', 'per_page'])
+            'filters' => [
+                'search' => $request->input('search'),
+                'sort' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+                'per_page' => $request->input('per_page', 10),
+            ],
         ]);
     }
 
-    public function create()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): Response
     {
-        $this->authorize('create roles');
-        
         return Inertia::render('Roles/Create', [
-            'permissions' => Permission::orderBy('name')->get()
+            'permissions' => Permission::all(['id', 'name']),
         ]);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        $this->authorize('create roles');
-        
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:roles'],
-            'permissions' => ['required', 'array'],
-            'permissions.*' => ['exists:permissions,id']
+            'name' => 'required|string|max:255|unique:roles',
+            'permissions' => 'required|array',
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role = Role::create([
-            'name' => $validated['name']
-        ]);
-
-        $role->syncPermissions($validated['permissions']);
+        $role = Role::create(['name' => $validated['name']]);
+        $role->permissions()->sync($validated['permissions']);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role created successfully.');
     }
 
-    public function show(Role $role)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Role $role): Response
     {
-        $this->authorize('view roles');
+        $role->load('permissions');
         
         return Inertia::render('Roles/Show', [
-            'role' => $role->load('permissions')
+            'role' => $role,
         ]);
     }
 
-    public function edit(Role $role)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Role $role): Response
     {
-        $this->authorize('edit roles');
-        
-        if($role->name === 'super-admin') {
-            return redirect()->route('admin.roles.index')
-                ->with('error', 'Super Admin role cannot be edited.');
-        }
-        
         return Inertia::render('Roles/Edit', [
             'role' => $role->load('permissions'),
-            'permissions' => Permission::orderBy('name')->get()
+            'permissions' => Permission::all(['id', 'name']),
         ]);
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Role $role)
     {
-        $this->authorize('edit roles');
-        
-        if($role->name === 'super-admin') {
-            return redirect()->route('admin.roles.index')
-                ->with('error', 'Super Admin role cannot be edited.');
-        }
-
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name,' . $role->id],
-            'permissions' => ['required', 'array'],
-            'permissions.*' => ['exists:permissions,id']
+            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+            'permissions' => 'required|array',
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role->update([
-            'name' => $validated['name']
-        ]);
-
-        $role->syncPermissions($validated['permissions']);
+        $role->update(['name' => $validated['name']]);
+        $role->permissions()->sync($validated['permissions']);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role updated successfully.');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Role $role)
     {
-        $this->authorize('delete roles');
-
-        if($role->name === 'super-admin') {
-            return redirect()->route('admin.roles.index')
-                ->with('error', 'Super Admin role cannot be deleted.');
+        if ($role->name === 'super-admin') {
+            return back()->with('error', 'Cannot delete super-admin role.');
         }
 
         $role->delete();

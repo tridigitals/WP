@@ -5,40 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        $this->authorize('view tags');
-
-        $query = Tag::query()
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->when($request->sort, function ($query, $sort) {
-                $query->orderBy($sort, $request->direction ?? 'asc');
-            }, function ($query) {
-                $query->orderBy('name');
-            });
-
         return Inertia::render('Tags/Index', [
-            'tags' => $query->paginate($request->input('per_page', 10))
+            'tags' => Tag::query()
+                ->when($request->input('search'), function ($query, $search) {
+                    $query->where('name', 'like', "%{$search}%");
+                })
+                ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
+                    $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
+                }, function ($query) {
+                    $query->orderBy('created_at', 'desc');
+                })
+                ->paginate($request->input('per_page', 10))
                 ->withQueryString(),
-            'filters' => $request->only(['search', 'sort', 'direction', 'per_page'])
+            'filters' => [
+                'search' => $request->input('search'),
+                'sort' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+                'per_page' => $request->input('per_page', 10),
+            ],
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): Response
     {
-        $this->authorize('create tags');
-
         return Inertia::render('Tags/Create');
     }
 
@@ -47,10 +48,9 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create tags');
-
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:tags',
+            'slug' => 'required|string|max:255|unique:tags',
             'description' => 'nullable|string',
         ]);
 
@@ -63,10 +63,8 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tag $tag)
+    public function show(Tag $tag): Response
     {
-        $this->authorize('view tags');
-
         return Inertia::render('Tags/Show', [
             'tag' => $tag,
         ]);
@@ -75,10 +73,8 @@ class TagController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tag $tag)
+    public function edit(Tag $tag): Response
     {
-        $this->authorize('edit tags');
-
         return Inertia::render('Tags/Edit', [
             'tag' => $tag,
         ]);
@@ -89,10 +85,9 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        $this->authorize('edit tags');
-
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:tags,name,' . $tag->id,
+            'slug' => 'required|string|max:255|unique:tags,slug,' . $tag->id,
             'description' => 'nullable|string',
         ]);
 
@@ -107,8 +102,6 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
-        $this->authorize('delete tags');
-
         $tag->delete();
 
         return redirect()->route('admin.tags.index')
