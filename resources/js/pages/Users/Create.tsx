@@ -2,8 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Role } from '@/types';
-import { type BreadcrumbItem } from '@/types';
+import { Role, BreadcrumbItem } from '@/types';
 
 interface Props {
   roles: Role[];
@@ -21,6 +20,27 @@ const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Create User',
     href: '/admin/users/create',
+  },
+];
+
+const socialMediaPlatforms = [
+  {
+    name: 'twitter',
+    label: 'Twitter',
+    placeholder: 'https://twitter.com/username',
+    icon: 'Twitter',
+  },
+  {
+    name: 'linkedin',
+    label: 'LinkedIn',
+    placeholder: 'https://linkedin.com/in/username',
+    icon: 'LinkedIn',
+  },
+  {
+    name: 'github',
+    label: 'GitHub',
+    placeholder: 'https://github.com/username',
+    icon: 'GitHub',
   },
 ];
 
@@ -56,13 +76,12 @@ export default function CreateUser({ roles }: Props) {
           <h1 className="text-2xl font-semibold">Create New User</h1>
         </div>
 
-        <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
-          <form onSubmit={handleSubmit} className="p-6">
-            <div className="space-y-6">
-              {/* Basic Information */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Basic Information */}
+          <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+            <div className="px-4 py-5 sm:p-6">
+              <h2 className="text-lg font-medium mb-4">Basic Information</h2>
               <div className="space-y-4">
-                <h2 className="text-lg font-medium">Basic Information</h2>
-                
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Name
@@ -124,39 +143,44 @@ export default function CreateUser({ roles }: Props) {
                   />
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Roles */}
-              <div className="space-y-4">
-                <h2 className="text-lg font-medium">Roles</h2>
-                <div className="space-y-2">
-                  {roles.map((role) => (
-                    <label key={role.id} className="inline-flex items-center mr-4">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600"
-                        checked={data.roles.includes(role.id)}
-                        onChange={(e) => {
-                          const roles = e.target.checked
-                            ? [...data.roles, role.id]
-                            : data.roles.filter((id) => id !== role.id);
-                          setData('roles', roles);
-                        }}
-                      />
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                        {role.name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                {errors.roles && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.roles}</p>
-                )}
+          {/* Roles */}
+          <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+            <div className="px-4 py-5 sm:p-6">
+              <h2 className="text-lg font-medium mb-4">Roles</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {roles.map((role) => (
+                  <label key={role.id} className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600"
+                      checked={data.roles.includes(role.id)}
+                      onChange={(e) => {
+                        const roles = e.target.checked
+                          ? [...data.roles, role.id]
+                          : data.roles.filter((id) => id !== role.id);
+                        setData('roles', roles);
+                      }}
+                    />
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
+                      {role.name}
+                    </span>
+                  </label>
+                ))}
               </div>
+              {errors.roles && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.roles}</p>
+              )}
+            </div>
+          </div>
 
-              {/* Profile Information */}
+          {/* Profile Information */}
+          <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+            <div className="px-4 py-5 sm:p-6">
+              <h2 className="text-lg font-medium mb-4">Profile Information</h2>
               <div className="space-y-4">
-                <h2 className="text-lg font-medium">Profile Information</h2>
-                
                 <div>
                   <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Bio
@@ -177,55 +201,62 @@ export default function CreateUser({ roles }: Props) {
                   <label htmlFor="website" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Website
                   </label>
-                  <input
-                    type="url"
-                    id="website"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
-                    value={data.website}
-                    onChange={e => setData('website', e.target.value)}
-                  />
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <input
+                      type="url"
+                      id="website"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                      value={data.website}
+                      onChange={e => setData('website', e.target.value)}
+                      placeholder="https://example.com"
+                    />
+                  </div>
                   {errors.website && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.website}</p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Social Media Links
                   </label>
-                  {['twitter', 'linkedin', 'github'].map((platform) => (
-                    <div key={platform} className="mt-2">
-                      <label htmlFor={platform} className="block text-sm text-gray-600 dark:text-gray-300 capitalize">
-                        {platform}
-                      </label>
-                      <input
-                        type="url"
-                        id={platform}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
-                        value={data.social_media_links[platform] || ''}
-                        onChange={e => updateSocialMedia(platform, e.target.value)}
-                        placeholder={`https://${platform}.com/username`}
-                      />
-                    </div>
-                  ))}
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    {socialMediaPlatforms.map((platform) => (
+                      <div key={platform.name} className="space-y-1">
+                        <label htmlFor={platform.name} className="block text-sm text-gray-600 dark:text-gray-300">
+                          {platform.label}
+                        </label>
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                          <input
+                            type="url"
+                            id={platform.name}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                            value={data.social_media_links[platform.name] || ''}
+                            onChange={e => updateSocialMedia(platform.name, e.target.value)}
+                            placeholder={platform.placeholder}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => window.history.back()}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={processing}>
-                  Create User
-                </Button>
-              </div>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => window.history.back()}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={processing}>
+              Create User
+            </Button>
+          </div>
+        </form>
       </div>
     </AppLayout>
   );

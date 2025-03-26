@@ -1,20 +1,13 @@
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Permission } from '@/types';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { type BreadcrumbItem } from '@/types';
+import { Permission, BreadcrumbItem } from '@/types';
+import { DataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/data-table';
 
 interface Props {
-  permissions: Permission[];
+  permissions: PaginatedData<Permission>;
+  filters: DataTableFilters;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -28,7 +21,56 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Permissions({ permissions }: Props) {
+export default function Permissions({ permissions, filters }: Props) {
+  const { delete: destroy, processing } = useForm({});
+
+  const handleDelete = (permission: Permission) => {
+    if (confirm(`Are you sure you want to delete the permission "${permission.name}"?`)) {
+      destroy(route('admin.permissions.destroy', permission.id));
+    }
+  };
+
+  const columns = [
+    {
+      key: 'name' as const,
+      label: 'Name',
+      sortable: true,
+    },
+    {
+      key: 'created_at' as const,
+      label: 'Created At',
+      sortable: true,
+      render: (permission: Permission) => new Date(permission.created_at).toLocaleDateString(),
+    },
+    {
+      key: 'actions' as const,
+      label: 'Actions',
+      render: (permission: Permission) => (
+        <div className="flex justify-end gap-2">
+          <Link href={route('admin.permissions.show', permission.id)}>
+            <Button variant="outline" size="sm">
+              View
+            </Button>
+          </Link>
+          <Link href={route('admin.permissions.edit', permission.id)}>
+            <Button variant="outline" size="sm">
+              Edit
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(permission)}
+            disabled={processing}
+            className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ] as const;
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Permission Management" />
@@ -40,45 +82,11 @@ export default function Permissions({ permissions }: Props) {
           </Link>
         </div>
 
-        <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {permissions.map((permission) => (
-                  <TableRow key={permission.id}>
-                    <TableCell className="font-medium">
-                      {permission.name}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(permission.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link href={route('admin.permissions.edit', permission.id)}>
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                        </Link>
-                        <Link href={route('admin.permissions.show', permission.id)}>
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <DataTable<Permission>
+          data={permissions}
+          columns={columns}
+          filters={filters}
+        />
       </div>
     </AppLayout>
   );

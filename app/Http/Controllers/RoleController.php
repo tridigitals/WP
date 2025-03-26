@@ -9,12 +9,24 @@ use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('view roles');
         
+        $query = Role::with('permissions')
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($request->sort, function ($query, $sort) {
+                $query->orderBy($sort, $request->direction ?? 'asc');
+            }, function ($query) {
+                $query->orderBy('name');
+            });
+
         return Inertia::render('Roles/Index', [
-            'roles' => Role::with('permissions')->orderBy('name')->get()
+            'roles' => $query->paginate($request->input('per_page', 10))
+                ->withQueryString(),
+            'filters' => $request->only(['search', 'sort', 'direction', 'per_page'])
         ]);
     }
 
@@ -52,8 +64,7 @@ class RoleController extends Controller
         $this->authorize('view roles');
         
         return Inertia::render('Roles/Show', [
-            'role' => $role->load('permissions'),
-            'permissions' => Permission::orderBy('name')->get()
+            'role' => $role->load('permissions')
         ]);
     }
 

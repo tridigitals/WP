@@ -9,12 +9,24 @@ use App\Http\Controllers\Controller;
 
 class PermissionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('view permissions');
         
+        $query = Permission::query()
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($request->sort, function ($query, $sort) {
+                $query->orderBy($sort, $request->direction ?? 'asc');
+            }, function ($query) {
+                $query->orderBy('name');
+            });
+
         return Inertia::render('Permissions/Index', [
-            'permissions' => Permission::orderBy('name')->get()
+            'permissions' => $query->paginate($request->input('per_page', 10))
+                ->withQueryString(),
+            'filters' => $request->only(['search', 'sort', 'direction', 'per_page'])
         ]);
     }
 
@@ -44,7 +56,7 @@ class PermissionController extends Controller
         $this->authorize('view permissions');
         
         return Inertia::render('Permissions/Show', [
-            'permission' => $permission
+            'permission' => $permission->load('roles')
         ]);
     }
 
