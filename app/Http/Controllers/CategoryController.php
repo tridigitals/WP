@@ -14,23 +14,30 @@ class CategoryController extends Controller
      */
     public function index(Request $request): Response
     {
+        $direction = $request->input('direction', 'asc');
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $sort = $request->input('sort');
+        $validColumns = ['name', 'slug', 'created_at', 'updated_at'];
+        if (!in_array($sort, $validColumns)) {
+            $sort = 'name';
+        }
+
         return Inertia::render('Categories/Index', [
             'categories' => Category::query()
                 ->with('parent')
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('name', 'like', "%{$search}%");
                 })
-                ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
-                    $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
-                }, function ($query) {
-                    $query->orderBy('created_at', 'desc');
-                })
+                ->orderBy($sort, $direction)
                 ->paginate($request->input('per_page', 10))
                 ->withQueryString(),
             'filters' => [
                 'search' => $request->input('search'),
-                'sort' => $request->input('sort'),
-                'direction' => $request->input('direction'),
+                'sort' => $sort,
+                'direction' => $direction,
                 'per_page' => $request->input('per_page', 10),
             ],
         ]);

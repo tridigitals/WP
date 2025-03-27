@@ -52,10 +52,10 @@ tambahkan unit test di setiap fitur
 - [ ] Post meta handling
 
 ### Category & Tag Management
-- [ ] CRUD operations
-- [ ] Hierarchical categories
-- [ ] Slug generation
-- [ ] Post associations
+- [x] CRUD operations
+- [x] Hierarchical categories
+- [x] Slug generation
+- [x] Post associations
 
 ### Media Management
 - [ ] File upload system

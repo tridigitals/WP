@@ -15,6 +15,17 @@ class UserController extends Controller
     {
         $this->authorize('view users');
         
+        $direction = $request->input('direction', 'asc');
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $sort = $request->input('sort');
+        $validColumns = ['name', 'email', 'created_at', 'updated_at'];
+        if (!in_array($sort, $validColumns)) {
+            $sort = 'name';
+        }
+
         $query = User::with('roles')
             ->when($request->input('search'), function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -22,19 +33,15 @@ class UserController extends Controller
                       ->orWhere('email', 'like', "%{$search}%");
                 });
             })
-            ->when($request->has(['sort', 'direction']), function ($query) use ($request) {
-                $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
-            }, function ($query) {
-                $query->orderBy('name');
-            });
+            ->orderBy($sort, $direction);
 
         return Inertia::render('Users/Index', [
             'users' => $query->paginate($request->input('per_page', 10))
                 ->withQueryString(),
             'filters' => [
                 'search' => $request->input('search'),
-                'sort' => $request->input('sort'),
-                'direction' => $request->input('direction'),
+                'sort' => $sort,
+                'direction' => $direction,
                 'per_page' => $request->input('per_page', 10),
             ]
         ]);
