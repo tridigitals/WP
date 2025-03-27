@@ -35,21 +35,21 @@ export default function Show({ post }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`View Post - ${post.title}`} />
       
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
-        <div className="flex justify-between items-center">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-2xl font-semibold">{post.title}</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Link href={route('admin.posts.edit', post.id)}>
-              <Button variant="outline">Edit Post</Button>
+              <Button variant="outline" className="w-full sm:w-auto">Edit Post</Button>
             </Link>
             <Link href={route('admin.posts.index')}>
-              <Button variant="outline">Back to List</Button>
+              <Button variant="outline" className="w-full sm:w-auto">Back to List</Button>
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
             {post.featured_image && (
               <img
                 src={post.featured_image}

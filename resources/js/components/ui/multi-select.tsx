@@ -33,11 +33,12 @@ export function MultiSelect({
   onChange,
   placeholder = "Select items...",
 }: MultiSelectProps) {
-  const [open, setOpen] = React.useState(false)
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [newTag, setNewTag] = React.useState('')
 
-  const selectedLabels = value.map(v => 
-    options.find(option => option.value === v)?.label
-  ).filter(Boolean)
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleSelect = (optionValue: string) => {
     const newValue = value.includes(optionValue)
@@ -46,70 +47,102 @@ export function MultiSelect({
     onChange(newValue)
   }
 
-  const handleRemove = (optionValue: string) => {
-    onChange(value.filter(v => v !== optionValue))
+  const handleAddNewTag = () => {
+    if (newTag && !options.find(opt => opt.label.toLowerCase() === newTag.toLowerCase())) {
+      const newOption = { value: newTag.toLowerCase(), label: newTag }
+      options.push(newOption)
+      handleSelect(newOption.value)
+      setNewTag('')
+    }
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          <div className="flex flex-wrap gap-1">
-            {selectedLabels.length > 0 ? (
-              selectedLabels.map((label, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-sm dark:bg-slate-800"
-                >
-                  {label}
-                  <button
-                    type="button"
-                    className="ml-1 rounded-full outline-none ring-offset-2 focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleRemove(value[i])
-                    }}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))
-            ) : (
-              <span className="text-slate-500 dark:text-slate-400">
-                {placeholder}
-              </span>
-            )}
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={`Search ${placeholder.toLowerCase()}...`}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
+      
+      <div className="max-h-[200px] overflow-y-auto rounded-md border p-2">
+        {filteredOptions.length === 0 ? (
+          <div className="py-6 text-center text-sm text-muted-foreground">
+            No items found.
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-        <Command>
-          <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
-          <CommandEmpty>No items found.</CommandEmpty>
-          <CommandGroup>
-            {options.map(option => (
-              <CommandItem
+        ) : (
+          <div className="space-y-1">
+            {filteredOptions.map(option => (
+              <label
                 key={option.value}
-                onSelect={() => handleSelect(option.value)}
+                className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent cursor-pointer"
               >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value.includes(option.value) ? "opacity-100" : "opacity-0"
-                  )}
+                <input
+                  type="checkbox"
+                  checked={value.includes(option.value)}
+                  onChange={() => handleSelect(option.value)}
+                  className="h-4 w-4 rounded border-gray-300"
                 />
                 {option.label}
-              </CommandItem>
+              </label>
             ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </div>
+        )}
+      </div>
+
+      {placeholder.toLowerCase().includes('tag') && (
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            placeholder="Add new tag..."
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddNewTag()
+              }
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddNewTag}
+            disabled={!newTag}
+          >
+            Add
+          </Button>
+        </div>
+      )}
+
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1 pt-2">
+          {value.map((v, i) => {
+            const label = options.find(opt => opt.value === v)?.label
+            if (!label) return null
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-sm dark:bg-slate-800"
+              >
+                {label}
+                <button
+                  type="button"
+                  className="ml-1 rounded-full outline-none ring-offset-2 focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                  onClick={() => handleSelect(v)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }

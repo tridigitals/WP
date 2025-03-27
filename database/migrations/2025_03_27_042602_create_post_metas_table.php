@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('post_meta', function (Blueprint $table) {
+        Schema::create('post_metas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->string('key');
-            $table->text('value')->nullable();
+            $table->string('meta_key');
+            $table->text('meta_value')->nullable();
             $table->timestamps();
 
             // Add a unique constraint to prevent duplicate meta keys for a post
-            $table->unique(['post_id', 'key']);
+            $table->unique(['post_id', 'meta_key']);
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_meta');
+        Schema::dropIfExists('post_metas');
     }
 };

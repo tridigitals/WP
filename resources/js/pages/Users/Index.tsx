@@ -61,16 +61,16 @@ export default function Users({ users, filters }: Props) {
       key: 'actions' as const,
       label: 'Actions',
       render: (user: User) => (
-        <div className="flex justify-end gap-2">
-          <Link href={route('admin.users.show', user.id)}>
-            <Button variant="outline" size="sm">
+        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end w-full">
+          <Link href={route('admin.users.show', user.id)} className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               View
             </Button>
           </Link>
           {!user.roles.some(role => role.name === 'super-admin') && (
             <>
-              <Link href={route('admin.users.edit', user.id)}>
-                <Button variant="outline" size="sm">
+              <Link href={route('admin.users.edit', user.id)} className="w-full sm:w-auto">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   Edit
                 </Button>
               </Link>
@@ -79,7 +79,7 @@ export default function Users({ users, filters }: Props) {
                 size="sm"
                 onClick={() => destroy(route('admin.users.destroy', user.id))}
                 disabled={processing}
-                className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+                className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
               >
                 Delete
               </Button>
@@ -94,12 +94,16 @@ export default function Users({ users, filters }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="User Management" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">User Management</h1>
-          <div className="flex items-center space-x-2">
-            <Link href={route('admin.users.create')}>
-              <Button>Create User</Button>
-            </Link>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">User Management</h1>
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full sm:w-auto">
+              <div className="flex-1 sm:flex-none">
+                <Link href={route('admin.users.create')} className="block w-full">
+                  <Button className="w-full">Create User</Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 

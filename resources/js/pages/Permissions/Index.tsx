@@ -46,14 +46,14 @@ export default function Permissions({ permissions, filters }: Props) {
       key: 'actions' as const,
       label: 'Actions',
       render: (permission: Permission) => (
-        <div className="flex justify-end gap-2">
-          <Link href={route('admin.permissions.show', permission.id)}>
-            <Button variant="outline" size="sm">
+        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end w-full">
+          <Link href={route('admin.permissions.show', permission.id)} className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               View
             </Button>
           </Link>
-          <Link href={route('admin.permissions.edit', permission.id)}>
-            <Button variant="outline" size="sm">
+          <Link href={route('admin.permissions.edit', permission.id)} className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Edit
             </Button>
           </Link>
@@ -62,7 +62,7 @@ export default function Permissions({ permissions, filters }: Props) {
             size="sm"
             onClick={() => handleDelete(permission)}
             disabled={processing}
-            className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+            className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
           >
             Delete
           </Button>
@@ -75,12 +75,16 @@ export default function Permissions({ permissions, filters }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Permission Management" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">Permission Management</h1>
-          <div className="flex items-center space-x-2">
-            <Link href={route('admin.permissions.create')}>
-              <Button>Create Permission</Button>
-            </Link>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">Permission Management</h1>
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full sm:w-auto">
+              <div className="flex-1 sm:flex-none">
+                <Link href={route('admin.permissions.create')} className="block w-full">
+                  <Button className="w-full">Create Permission</Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 

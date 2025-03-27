@@ -113,10 +113,10 @@ export default function Create({ categories, tags }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Create Post" />
       
-      <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col gap-4 p-4">
-        <div className="flex justify-between items-center">
+      <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-2xl font-semibold">Create Post</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Select
               value={data.status}
               onValueChange={(value: 'draft' | 'published' | 'scheduled') => {
@@ -126,7 +126,7 @@ export default function Create({ categories, tags }: Props) {
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
@@ -135,14 +135,14 @@ export default function Create({ categories, tags }: Props) {
                 <SelectItem value="scheduled">Scheduled</SelectItem>
               </SelectContent>
             </Select>
-            <Button type="submit" disabled={processing}>
+            <Button type="submit" disabled={processing} className="w-full sm:w-auto">
               Save Post
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
             <div>
               <Label htmlFor="title">Title</Label>
               <Input

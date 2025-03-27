@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Post, BreadcrumbItem } from '@/types';
-import { EnhancedDataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/enhanced-data-table'; // Changed import
+import { EnhancedDataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/enhanced-data-table'; 
 import {
   Select,
   SelectContent,
@@ -56,6 +56,12 @@ export default function Posts({ posts, filters }: Props) {
       key: 'title' as const,
       label: 'Title',
       sortable: true,
+      className: 'break-words whitespace-normal max-w-[200px] md:max-w-full',
+      render: (post: Post) => (
+        <div className="max-w-[200px] md:max-w-full truncate">
+          {post.title}
+        </div>
+      ),
     },
     {
       key: 'status' as const,
@@ -86,15 +92,15 @@ export default function Posts({ posts, filters }: Props) {
       key: 'actions' as const,
       label: 'Actions',
       render: (post: Post) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end w-full">
           {filters.status === 'trash' ? (
-            <>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleRestore(post)}
                 disabled={processing}
-                className="text-green-600 hover:text-green-700 hover:border-green-700 dark:text-green-500 dark:hover:text-green-400 dark:hover:border-green-400"
+                className="w-full sm:w-auto text-green-600 hover:text-green-700 hover:border-green-700 dark:text-green-500 dark:hover:text-green-400 dark:hover:border-green-400"
               >
                 Restore
               </Button>
@@ -103,20 +109,20 @@ export default function Posts({ posts, filters }: Props) {
                 size="sm"
                 onClick={() => handleForceDelete(post)}
                 disabled={processing}
-                className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+                className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
               >
                 Delete Permanently
               </Button>
-            </>
+            </div>
           ) : (
-            <>
-              <Link href={route('admin.posts.show', post.id)}>
-                <Button variant="outline" size="sm">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Link href={route('admin.posts.show', post.id)} className="w-full sm:w-auto">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   View
                 </Button>
               </Link>
-              <Link href={route('admin.posts.edit', post.id)}>
-                <Button variant="outline" size="sm">
+              <Link href={route('admin.posts.edit', post.id)} className="w-full sm:w-auto">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   Edit
                 </Button>
               </Link>
@@ -125,11 +131,11 @@ export default function Posts({ posts, filters }: Props) {
                 size="sm"
                 onClick={() => handleDelete(post)}
                 disabled={processing}
-                className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
+                className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
               >
                 Move to Trash
               </Button>
-            </>
+            </div>
           )}
         </div>
       ),
@@ -140,47 +146,51 @@ export default function Posts({ posts, filters }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Post Management" />
       <div className="max-w-full flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Post Management</h1>
-          <div className="flex gap-4 items-center">
-            <Select
-              value={filters.status}
-              onValueChange={(value) => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('status', value);
-                window.location.href = url.toString();
-              }}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Posts</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="draft">Drafts</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="trash">Trash</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {filters.status !== 'trash' && (
-              <Link href={route('admin.posts.create')}>
-                <Button>Create Post</Button>
-              </Link>
-            )}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">Post Management</h1>
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full sm:w-auto">
+              <div className="flex-1 sm:flex-none">
+                <Select
+                  value={filters.status}
+                  onValueChange={(value) => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('status', value);
+                    window.location.href = url.toString();
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Posts</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="draft">Drafts</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="trash">Trash</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {filters.status !== 'trash' && (
+                <div className="flex-1 sm:flex-none">
+                  <Link href={route('admin.posts.create')} className="block w-full">
+                    <Button className="w-full">Create Post</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="w-full overflow-hidden rounded-md border">
-          <div className="overflow-x-auto">
-            {/* Changed to EnhancedDataTable */}
+          <div className="overflow-x-auto md:overflow-visible">
             <EnhancedDataTable<Post>
               data={posts}
               columns={tableColumns}
               filters={filters}
               onBulkAction={(action, selectedPosts) => {
                 if (action === 'delete') {
-                  // Determine if we are in the trash view
                   const isTrashView = filters.status === 'trash';
                   const confirmMessage = isTrashView
                     ? `Are you sure you want to permanently delete ${selectedPosts.length} posts?`
@@ -196,7 +206,6 @@ export default function Posts({ posts, filters }: Props) {
                     });
                   }
                 }
-                // Add other bulk actions like 'restore' if needed
               }}
             />
           </div>
