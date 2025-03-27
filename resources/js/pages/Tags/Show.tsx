@@ -27,9 +27,9 @@ export default function ShowTag({ tag }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Tag: ${tag.name}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-2 md:p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Tag Details</h1>
+          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg">Tag Details</h1>
           <div className="flex gap-2">
             <Link href={route('admin.tags.edit', tag.id)}>
               <Button variant="outline">Edit Tag</Button>

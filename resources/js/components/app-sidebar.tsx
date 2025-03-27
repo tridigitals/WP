@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon, Settings } from 'lucide-react';
+import { BookOpen, FileText, Folder, LayoutGrid, Users, Shield, Key, Tag as TagIcon, Settings } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/lib/utils';
@@ -69,6 +69,15 @@ export function AppSidebar() {
             href: '#',
             icon: Users,
             children: userManagementChildren,
+        });
+    }
+
+    // Add Post Management if user has permission
+    if (hasPermission(user, 'view posts')) {
+        mainNavItems.push({
+            title: 'Post Management',
+            href: '/admin/posts',
+            icon: FileText,
         });
     }
 

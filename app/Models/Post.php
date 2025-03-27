@@ -130,4 +130,12 @@ class Post extends Model
                $this->published_at !== null &&
                $this->published_at <= now();
     }
+
+    /**
+     * Get the meta data for the post.
+     */
+    public function postMeta()
+    {
+        return $this->hasMany(PostMeta::class);
+    }
 }

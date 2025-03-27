@@ -13,17 +13,17 @@ return new class extends Migration
     {
         // Create pivot table for posts and categories
         Schema::create('category_post', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->primary(['category_id', 'post_id']);
             $table->timestamps();
         });
 
         // Create pivot table for posts and tags
         Schema::create('post_tag', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('tag_id')->constrained()->onDelete('cascade');
+            $table->primary(['post_id', 'tag_id']);
             $table->timestamps();
         });
     }

@@ -1,11 +1,11 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
 export type Column<T> = {
-  key: keyof T | 'actions';
+  key: keyof T | 'actions' | 'select';
   label: string;
   sortable?: boolean;
   render?: (item: T) => React.ReactNode;
@@ -32,14 +32,19 @@ interface DataTableProps<T> {
   filters: DataTableFilters;
   onSearch?: (value: string) => void;
   tableClasses?: string;
+  onBulkAction?: (action: string, selectedItems: T[]) => void;
 }
 
-export function DataTable<T>({ 
-  data, 
-  columns, 
-  filters, 
-  onSearch 
+export function DataTableEnhanced<T>({
+  data,
+  columns,
+  filters,
+  onSearch,
+  tableClasses,
+  onBulkAction,
 }: DataTableProps<T>) {
+  const [selectedItems, setSelectedItems] = useState<T[]>([]);
+
   const handleSort = (key: string) => {
     const direction = filters.sort === key && filters.direction === 'asc' ? 'desc' : 'asc';
     router.get(window.location.pathname, { ...filters, sort: key, direction }, {
@@ -71,16 +76,32 @@ export function DataTable<T>({
     if (filters.sort !== key) {
       return <ChevronsUpDown className="h-4 w-4 text-gray-400" />;
     }
-    return filters.direction === 'asc' 
-      ? <ChevronUp className="h-4 w-4 text-primary" />
-      : <ChevronDown className="h-4 w-4 text-primary" />;
+    return filters.direction === 'asc' ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />;
+  };
+
+  const handleSelectItem = (item: T) => {
+    setSelectedItems((prevSelected) => {
+      const isSelected = prevSelected.some((selectedItem) => selectedItem === item);
+      return isSelected ? prevSelected.filter((selectedItem) => selectedItem !== item) : [...prevSelected, item];
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectedItems(data.data);
+  };
+
+  const handleBulkAction = (action: string) => {
+    if (onBulkAction) {
+      onBulkAction(action, selectedItems);
+    }
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${tableClasses}`}>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <input
+            type="text"
             placeholder="Search..."
             className="h-9 w-[150px] lg:w-[250px] rounded-md border-gray-300 px-3 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
             defaultValue={filters.search}
@@ -107,17 +128,18 @@ export function DataTable<T>({
           <Table className="table-auto">
             <TableHeader>
               <TableRow>
+                <TableHead>
+                  <input type="checkbox" checked={selectedItems.length === data.data.length} onChange={handleSelectAll} />
+                </TableHead>
                 {columns.map((column) => (
-                  <TableHead 
+                  <TableHead
                     key={String(column.key)}
                     className={column.sortable ? 'cursor-pointer select-none hover:bg-accent/50' : ''}
                     onClick={() => column.sortable && handleSort(String(column.key))}
                   >
                     <div className="flex items-center gap-2">
                       {column.label}
-                      {column.sortable && (
-                        <span className="inline-flex">{getSortIcon(String(column.key))}</span>
-                      )}
+                      {column.sortable && <span className="inline-flex">{getSortIcon(String(column.key))}</span>}
                     </div>
                   </TableHead>
                 ))}
@@ -126,20 +148,19 @@ export function DataTable<T>({
             <TableBody>
               {data.data.map((item, index) => (
                 <TableRow key={index}>
+                  <TableCell>
+                    <input type="checkbox" checked={selectedItems.some((selectedItem) => selectedItem === item)} onChange={() => handleSelectItem(item)} />
+                  </TableCell>
                   {columns.map((column) => (
                     <TableCell key={String(column.key)}>
-                      {column.render 
-                        ? column.render(item) 
-                        : column.key === 'actions' 
-                          ? null 
-                          : String(item[column.key as keyof T] ?? '')}
+                      {column.render ? column.render(item) : column.key === 'actions' ? null : String(item[column.key as keyof T] ?? '')}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
               {data.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500 dark:text-gray-400">
+                  <TableCell colSpan={columns.length + 1} className="h-24 text-center text-gray-500 dark:text-gray-400">
                     No records found
                   </TableCell>
                 </TableRow>
@@ -158,10 +179,12 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.get(window.location.pathname, { ...filters, page: data.current_page - 1 }, {
-                preserveState: true,
-                preserveScroll: true,
-              })}
+              onClick={() =>
+                router.get(window.location.pathname, { ...filters, page: data.current_page - 1 }, {
+                  preserveState: true,
+                  preserveScroll: true,
+                })
+              }
             >
               Previous
             </Button>
@@ -170,16 +193,24 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.get(window.location.pathname, { ...filters, page: data.current_page + 1 }, {
-                preserveState: true,
-                preserveScroll: true,
-              })}
+              onClick={() =>
+                router.get(window.location.pathname, { ...filters, page: data.current_page + 1 }, {
+                  preserveState: true,
+                  preserveScroll: true,
+                })
+              }
             >
               Next
             </Button>
           )}
         </div>
       </div>
+      {selectedItems.length > 0 && (
+        <div className="flex gap-2">
+          <Button onClick={() => handleBulkAction('delete')}>Delete Selected</Button>
+          <Button onClick={() => handleBulkAction('edit')}>Edit Selected</Button>
+        </div>
+      )}
     </div>
   );
 }

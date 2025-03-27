@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { User, BreadcrumbItem } from '@/types';
-import { DataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/data-table';
+import { EnhancedDataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/enhanced-data-table';
 
 interface Props {
   users: PaginatedData<User>;
@@ -22,13 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Users({ users, filters }: Props) {
-  const { delete: destroy, processing } = useForm({});
-
-  const handleDelete = (user: User) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-      destroy(route('admin.users.destroy', user.id));
-    }
-  };
+  const { processing, delete: destroy } = useForm({});
 
   const columns = [
     {
@@ -83,7 +77,7 @@ export default function Users({ users, filters }: Props) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleDelete(user)}
+                onClick={() => destroy(route('admin.users.destroy', user.id))}
                 disabled={processing}
                 className="text-red-600 hover:text-red-700 hover:border-red-700 dark:text-red-500 dark:hover:text-red-400 dark:hover:border-red-400"
               >
@@ -101,16 +95,29 @@ export default function Users({ users, filters }: Props) {
       <Head title="User Management" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">User Management</h1>
-          <Link href={route('admin.users.create')}>
-            <Button>Create User</Button>
-          </Link>
+          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">User Management</h1>
+          <div className="flex items-center space-x-2">
+            <Link href={route('admin.users.create')}>
+              <Button>Create User</Button>
+            </Link>
+          </div>
         </div>
 
-        <DataTable<User>
+        <EnhancedDataTable<User>
           data={users}
           columns={columns}
           filters={filters}
+          onBulkAction={(action, selectedUsers) => {
+            if (action === 'delete') {
+              if (confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
+                selectedUsers.forEach(user => {
+                  if (!user.roles.some(role => role.name === 'super-admin')) {
+                    destroy(route('admin.users.destroy', user.id));
+                  }
+                });
+              }
+            }
+          }}
         />
       </div>
     </AppLayout>

@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Category, BreadcrumbItem } from '@/types';
-import { DataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/data-table';
+import { EnhancedDataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/enhanced-data-table';
 
 interface Props {
   categories: PaginatedData<Category>;
@@ -22,7 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Categories({ categories, filters }: Props) {
-  const { delete: destroy, processing } = useForm({});
+  const { processing, delete: destroy } = useForm({});
 
   const handleDelete = (category: Category) => {
     if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
@@ -89,19 +89,34 @@ export default function Categories({ categories, filters }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Category Management" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+      <div className="max-w-full flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Category Management</h1>
-          <Link href={route('admin.categories.create')}>
-            <Button>Create Category</Button>
-          </Link>
+          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">Category Management</h1>
+          <div className="flex items-center space-x-2">
+            <Link href={route('admin.categories.create')}>
+              <Button>Create Category</Button>
+            </Link>
+          </div>
         </div>
 
-        <DataTable<Category>
-          data={categories}
-          columns={columns}
-          filters={filters}
-        />
+        <div className="w-full overflow-hidden rounded-md border">
+          <div className="overflow-x-auto">
+            <EnhancedDataTable<Category>
+              data={categories}
+              columns={columns}
+              filters={filters}
+              onBulkAction={(action, selectedCategories) => {
+                if (action === 'delete') {
+                  if (confirm(`Are you sure you want to delete ${selectedCategories.length} categories?`)) {
+                    selectedCategories.forEach(category => {
+                      destroy(route('admin.categories.destroy', category.id));
+                    });
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
       </div>
     </AppLayout>
   );

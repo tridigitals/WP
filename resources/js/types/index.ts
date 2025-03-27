@@ -1,83 +1,113 @@
-import { Page } from '@inertiajs/core';
-import { type LucideIcon } from 'lucide-react';
-
-export interface BreadcrumbItem {
-  title: string;
-  href: string;
-}
-
-export interface NavItem {
-  title: string;
-  href: string;
-  icon: LucideIcon;
-  children?: NavItem[];
-}
-
-export type PageProps = {
-  auth: {
-    user: User | null;
-  };
-  flash: {
-    success?: string;
-    error?: string;
-  };
-  [key: string]: unknown;
-};
+import { LucideIcon } from "lucide-react";
 
 export interface User {
   id: number;
   name: string;
   email: string;
-  bio: string | null;
-  avatar: string | null;
-  website: string | null;
-  social_media_links: Record<string, string>;
-  roles: Role[];
-  permissions: Permission[];
+  permissions: string[];
+  roles: { id: number; name: string }[];
   created_at: string;
   updated_at: string;
-  hasRole: (role: string) => boolean;
+}
+
+export interface NavItem {
+  title: string;
+  href: string;
+  icon?: LucideIcon;
+  children?: NavItem[];
+}
+
+export interface BreadcrumbItem {
+    title: string;
+    href: string;
+}
+
+export interface PaginationData<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
 }
 
 export interface Tag {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Role {
-  id: number;
-  name: string;
-  permissions: Permission[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Permission {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  parent_id: number | null;
-  parent?: Category;
-  children?: Category[];
-  created_at: string;
-  updated_at: string;
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    parent_id?: number;
+    created_at: string;
+    updated_at: string;
+  }
+  
+  export interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    parent_id?: number;
+    parent?: Category | null;
+    created_at: string;
+    updated_at: string;
+  }
+  
+  export interface Permission {
+    id: number;
+    name: string;
+  }
+  
+  export interface Role {
+    id: number;
+    name: string;
+    permissions: Permission[];
+    created_at: string;
+    updated_at: string;
+  }
+  
+  export interface Permission {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+  }
+
+export interface PostMeta {
+    id: number;
+    post_id: number;
+    key: string;
+    value: string;
+    created_at: string;
+    updated_at: string;
 }
 
-export interface Column<T> {
-  key: keyof T | 'actions';
-  label: string;
-  sortable?: boolean;
-  render?: (item: T) => React.ReactNode;
+export interface Post {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    excerpt?: string;
+    status: 'draft' | 'published' | 'scheduled';
+    featured_image?: string;
+    author_id: number;
+    published_at?: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string;
+    author?: {
+        id: number;
+        name: string;
+    };
+    categories?: Category[];
+    tags?: Tag[];
+    postMeta?: PostMeta[];
+    comments_count?: number;
 }

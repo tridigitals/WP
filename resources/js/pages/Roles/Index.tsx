@@ -2,8 +2,8 @@ import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Role, BreadcrumbItem } from '@/types';
-import { DataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/data-table';
+import { Role, BreadcrumbItem, Permission } from '@/types';
+import { EnhancedDataTable, type PaginatedData, type DataTableFilters } from '@/components/ui/enhanced-data-table';
 
 interface Props {
   roles: PaginatedData<Role>;
@@ -22,7 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Roles({ roles, filters }: Props) {
-  const { delete: destroy, processing } = useForm({});
+  const { processing, delete: destroy } = useForm({});
 
   const handleDelete = (role: Role) => {
     if (role.name === 'super-admin') {
@@ -45,10 +45,8 @@ export default function Roles({ roles, filters }: Props) {
       key: 'permissions' as const,
       label: 'Permissions',
       render: (role: Role) => (
-        <div className="max-w-md overflow-hidden">
-          <p className="truncate">
-            {role.permissions.map(p => p.name).join(', ')}
-          </p>
+        <div className="overflow-hidden" style={{ maxWidth: '100px', whiteSpace: 'pre-wrap', fontSize: 'small' }}>
+          {role.permissions.map(p => p.name).join(', ')}
         </div>
       ),
     },
@@ -92,16 +90,29 @@ export default function Roles({ roles, filters }: Props) {
       <Head title="Role Management" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Role Management</h1>
-          <Link href={route('admin.roles.create')}>
-            <Button>Create Role</Button>
-          </Link>
+          <h1 className="text-2xl font-semibold sm:text-xl md:text-lg lg:text-base">Role Management</h1>
+          <div className="flex items-center space-x-2">
+            <Link href={route('admin.roles.create')}>
+              <Button>Create Role</Button>
+            </Link>
+          </div>
         </div>
 
-        <DataTable<Role>
+        <EnhancedDataTable<Role>
           data={roles}
           columns={columns}
           filters={filters}
+          onBulkAction={(action, selectedRoles) => {
+            if (action === 'delete') {
+              if (confirm(`Are you sure you want to delete ${selectedRoles.length} roles?`)) {
+                selectedRoles.forEach(role => {
+                  if (role.name !== 'super-admin') {
+                    destroy(route('admin.roles.destroy', role.id));
+                  }
+                });
+              }
+            }
+          }}
         />
       </div>
     </AppLayout>
