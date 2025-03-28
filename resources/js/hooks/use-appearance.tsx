@@ -1,73 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useTheme } from '@/components/theme-provider';
+import type { Theme as Appearance } from '@/components/theme-provider';
 
-export type Appearance = 'light' | 'dark' | 'system';
-
-const prefersDark = () => {
-    if (typeof window === 'undefined') {
-        return false;
-    }
-
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-};
-
-const setCookie = (name: string, value: string, days = 365) => {
-    if (typeof document === 'undefined') {
-        return;
-    }
-
-    const maxAge = days * 24 * 60 * 60;
-    document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
-};
-
-const applyTheme = (appearance: Appearance) => {
-    const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
-
-    document.documentElement.classList.toggle('dark', isDark);
-};
-
-const mediaQuery = () => {
-    if (typeof window === 'undefined') {
-        return null;
-    }
-
-    return window.matchMedia('(prefers-color-scheme: dark)');
-};
-
-const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'system');
-};
-
-export function initializeTheme() {
-    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
-
-    applyTheme(savedAppearance);
-
-    // Add the event listener for system theme changes...
-    mediaQuery()?.addEventListener('change', handleSystemThemeChange);
-}
+// Re-export the type if needed elsewhere under the old name
+export { type Appearance };
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('system');
+    // Use the theme context provided by ThemeProvider
+    const { theme, setTheme } = useTheme();
 
-    const updateAppearance = useCallback((mode: Appearance) => {
-        setAppearance(mode);
+    // Rename setTheme to updateAppearance for compatibility
+    // with existing components using this hook.
+    const updateAppearance = (mode: Appearance) => {
+        setTheme(mode);
+    };
 
-        // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
-
-        // Store in cookie for SSR...
-        setCookie('appearance', mode);
-
-        applyTheme(mode);
-    }, []);
-
-    useEffect(() => {
-        const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-        updateAppearance(savedAppearance || 'system');
-
-        return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);
-    }, [updateAppearance]);
-
-    return { appearance, updateAppearance } as const;
+    // Return the theme state and the setter function from the context
+    return { appearance: theme, updateAppearance } as const;
 }
+
+// Removed prefersDark, setCookie, applyTheme, mediaQuery,
+// handleSystemThemeChange, initializeTheme, local useState, and useEffect.
+// Theme logic is now centralized in ThemeProvider.
