@@ -92,9 +92,9 @@ export default function Posts({ posts, filters }: Props) {
       key: 'actions' as const,
       label: 'Actions',
       render: (post: Post) => (
-        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end w-full">
+        <> {/* Use Fragment and let EnhancedDataTable handle wrapping */}
           {filters.status === 'trash' ? (
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <> {/* Inner fragment for trash actions */}
               <Button
                 variant="outline"
                 size="sm"
@@ -113,9 +113,9 @@ export default function Posts({ posts, filters }: Props) {
               >
                 Delete Permanently
               </Button>
-            </div>
+            </>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <> {/* Inner fragment for standard actions */}
               <Link href={route('admin.posts.show', post.id)} className="w-full sm:w-auto">
                 <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   View
@@ -135,9 +135,9 @@ export default function Posts({ posts, filters }: Props) {
               >
                 Move to Trash
               </Button>
-            </div>
+            </>
           )}
-        </div>
+        </>
       ),
     },
   ] as const;

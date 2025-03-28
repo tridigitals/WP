@@ -10,16 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/lib/utils';
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
+    
 ];
 
 export function AppSidebar() {
@@ -32,6 +23,45 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
     ];
+    // Add Post Management section with nested items
+    if (hasPermission(user, 'view posts')) {
+        const postManagementChildren: NavItem[] = [];
+        
+        // Add Post Management if user has permission
+        if (hasPermission(user, 'view posts')) {
+            postManagementChildren.push({
+                title: 'Post Management',
+                href: '/admin/posts',
+                icon: FileText,
+            });
+        }
+            // Add Category Management if user has permission
+        if (hasPermission(user, 'view categories')) {
+            postManagementChildren.push({
+                title: 'Category Management',
+                href: '/admin/categories',
+                icon: Settings,
+            });
+        }
+
+        // Add Tag Management as a separate section
+        if (hasPermission(user, 'view tags')) {
+            postManagementChildren.push({
+                title: 'Tag Management',
+                href: '/admin/tags',
+                icon: TagIcon,
+            });
+        }
+
+
+        // Add User Management section with children
+        mainNavItems.push({
+            title: 'Posts',
+            href: '#',
+            icon: Users,
+            children: postManagementChildren,
+        });
+    }
 
     // Add User Management section with nested items
     if (hasPermission(user, 'view users')) {
@@ -69,33 +99,6 @@ export function AppSidebar() {
             href: '#',
             icon: Users,
             children: userManagementChildren,
-        });
-    }
-
-    // Add Post Management if user has permission
-    if (hasPermission(user, 'view posts')) {
-        mainNavItems.push({
-            title: 'Post Management',
-            href: '/admin/posts',
-            icon: FileText,
-        });
-    }
-
-    // Add Category Management if user has permission
-    if (hasPermission(user, 'view categories')) {
-        mainNavItems.push({
-            title: 'Category Management',
-            href: '/admin/categories',
-            icon: Settings,
-        });
-    }
-
-    // Add Tag Management as a separate section
-    if (hasPermission(user, 'view tags')) {
-        mainNavItems.push({
-            title: 'Tag Management',
-            href: '/admin/tags',
-            icon: TagIcon,
         });
     }
 
