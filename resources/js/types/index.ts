@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import { FormDataConvertible } from "@inertiajs/core";
 
 export interface User {
   id: number;
@@ -45,46 +46,41 @@ export interface Category {
     slug: string;
     description?: string;
     parent_id?: number;
-    created_at: string;
-    updated_at: string;
-  }
-  
-  export interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    parent_id?: number;
     parent?: Category | null;
     created_at: string;
     updated_at: string;
-  }
-  
-  export interface Permission {
+}
+
+export interface Permission {
     id: number;
     name: string;
-  }
-  
-  export interface Role {
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Role {
     id: number;
     name: string;
     permissions: Permission[];
     created_at: string;
     updated_at: string;
-  }
-  
-  export interface Permission {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-  }
+}
+
+export interface PostMetaInput {
+    meta_title?: string;
+    meta_description?: string;
+    focus_keyphrase?: string;
+    og_title?: string;
+    og_description?: string;
+    og_image?: string;
+    [key: string]: FormDataConvertible | undefined;
+}
 
 export interface PostMeta {
     id: number;
     post_id: number;
-    key: string;
-    value: string;
+    meta_key: string;
+    meta_value: string;
     created_at: string;
     updated_at: string;
 }
@@ -109,5 +105,6 @@ export interface Post {
     categories?: Category[];
     tags?: Tag[];
     postMeta?: PostMeta[];
+    meta?: PostMetaInput;
     comments_count?: number;
 }

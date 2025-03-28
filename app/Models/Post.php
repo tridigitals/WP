@@ -37,6 +37,20 @@ class Post extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['meta'];
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['postMeta'];
+
+    /**
      * The "booted" method of the model.
      */
     protected static function booted(): void
@@ -78,6 +92,26 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Get the post meta records.
+     */
+    public function postMeta()
+    {
+        return $this->hasMany(PostMeta::class);
+    }
+
+    /**
+     * Get all post meta as an associative array.
+     */
+    public function getMetaAttribute()
+    {
+        if (!$this->relationLoaded('postMeta')) {
+            $this->load('postMeta');
+        }
+
+        return $this->postMeta->pluck('meta_value', 'meta_key')->toArray();
     }
 
     /**
@@ -129,13 +163,5 @@ class Post extends Model
         return $this->status === 'published' &&
                $this->published_at !== null &&
                $this->published_at <= now();
-    }
-
-    /**
-     * Get the meta data for the post.
-     */
-    public function postMeta()
-    {
-        return $this->hasMany(PostMeta::class);
     }
 }

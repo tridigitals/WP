@@ -10,14 +10,21 @@ class PostMeta extends Model
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'post_metas';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<string>
      */
     protected $fillable = [
         'post_id',
-        'key',
-        'value'
+        'meta_key',
+        'meta_value'
     ];
 
     /**

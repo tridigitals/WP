@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      */
@@ -38,7 +40,7 @@ class PostController extends Controller
         return Inertia::render('Posts/Index', [
             'posts' => Post::query()
                 ->select('id', 'title', 'excerpt', 'status', 'author_id', 'published_at', 'created_at', 'deleted_at')
-                ->with(['author:id,name', 'categories:id,name', 'tags:id,name'])
+                ->with(['author:id,name', 'categories:id,name', 'tags:id,name', 'postMeta'])
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('title', 'like', "%{$search}%")
                           ->orWhere('content', 'like', "%{$search}%");
@@ -81,6 +83,8 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('Post meta data received:', ['meta' => $request->input('meta')]);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -97,8 +101,30 @@ class PostController extends Controller
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('public/posts');
-            $validated['featured_image'] = Storage::url($path);
+            $file = $request->file('featured_image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            
+            // Store original file using public disk
+            $path = Storage::disk('public')->putFileAs('posts', $file, $fileName);
+            $validated['featured_image'] = Storage::disk('public')->url($path);
+            
+            // Generate and store thumbnail
+            $image = Image::make($file);
+            $image->fit(300, 300, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            
+            // Create thumbnails directory if it doesn't exist
+            $thumbnailPath = 'posts/thumbnails';
+            if (!Storage::disk('public')->exists($thumbnailPath)) {
+                Storage::disk('public')->makeDirectory($thumbnailPath);
+            }
+            
+            // Save thumbnail
+            $thumbnailName = 'thumb_' . $fileName;
+            $thumbnailFullPath = $thumbnailPath . '/' . $thumbnailName;
+            Storage::disk('public')->put($thumbnailFullPath, (string) $image->encode());
         }
 
         // Set published_at based on status
@@ -106,11 +132,11 @@ class PostController extends Controller
             $validated['published_at'] = now();
         }
 
+        // Set author_id
+        $validated['author_id'] = auth()->id();
+
         // Create post
-        $post = Post::create([
-            ...$validated,
-            'author_id' => auth()->id(),
-        ]);
+        $post = Post::create(Arr::except($validated, ['meta', 'category_ids', 'tag_ids']));
 
         // Sync relationships
         if (isset($validated['category_ids'])) {
@@ -121,12 +147,26 @@ class PostController extends Controller
         }
 
         // Handle post meta
-        if (isset($validated['meta'])) {
+        if (isset($validated['meta']) && is_array($validated['meta'])) {
+            Log::info('Processing meta data for post:', ['post_id' => $post->id, 'meta' => $validated['meta']]);
+            
             foreach ($validated['meta'] as $key => $value) {
-                $post->postMeta()->create([
-                    'key' => $key,
-                    'value' => $value,
-                ]);
+                if (!empty($value)) {
+                    try {
+                        $post->postMeta()->create([
+                            'meta_key' => $key,
+                            'meta_value' => $value,
+                        ]);
+                        Log::info('Meta created:', ['key' => $key, 'value' => $value]);
+                    } catch (\Exception $e) {
+                        Log::error('Error saving meta:', [
+                            'post_id' => $post->id,
+                            'key' => $key,
+                            'value' => $value,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
             }
         }
 
@@ -165,6 +205,8 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        Log::info('Post meta data update received:', ['meta' => $request->input('meta')]);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -195,7 +237,7 @@ class PostController extends Controller
         }
 
         // Update post
-        $post->update($validated);
+        $post->update(Arr::except($validated, ['meta', 'category_ids', 'tag_ids']));
 
         // Sync relationships
         if (isset($validated['category_ids'])) {
@@ -206,15 +248,30 @@ class PostController extends Controller
         }
 
         // Handle post meta
-        if (isset($validated['meta'])) {
+        if (isset($validated['meta']) && is_array($validated['meta'])) {
+            Log::info('Processing meta update for post:', ['post_id' => $post->id, 'meta' => $validated['meta']]);
+            
             // Delete existing meta
             $post->postMeta()->delete();
+            
             // Create new meta
             foreach ($validated['meta'] as $key => $value) {
-                $post->postMeta()->create([
-                    'key' => $key,
-                    'value' => $value,
-                ]);
+                if (!empty($value)) {
+                    try {
+                        $post->postMeta()->create([
+                            'meta_key' => $key,
+                            'meta_value' => $value,
+                        ]);
+                        Log::info('Meta updated:', ['key' => $key, 'value' => $value]);
+                    } catch (\Exception $e) {
+                        Log::error('Error updating meta:', [
+                            'post_id' => $post->id,
+                            'key' => $key,
+                            'value' => $value,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
             }
         }
 

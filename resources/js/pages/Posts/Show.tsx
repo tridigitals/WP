@@ -59,11 +59,12 @@ export default function Show({ post }: Props) {
             )}
 
             <Card>
-              <CardContent className="p-6">
-                <div className="prose prose-sm dark:prose-invert max-w-none"
+                <CardContent className="p-6">
+                <div
+                  className="prose prose-sm dark:prose-invert max-w-none break-words"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
-              </CardContent>
+                </CardContent>
             </Card>
 
             {post.excerpt && (
@@ -152,11 +153,11 @@ export default function Show({ post }: Props) {
                   <h2 className="font-semibold">Meta Fields</h2>
                   <div className="space-y-2">
                     {post.postMeta.map(meta => (
-                      <div key={meta.id} className="grid grid-cols-2 gap-2">
+                      <div key={`${meta.meta_key}-${meta.meta_value}`} className="grid grid-cols-2 gap-2">
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {meta.key}
+                          {meta.meta_key}
                         </span>
-                        <span className="text-sm">{meta.value}</span>
+                        <span className="text-sm">{meta.meta_value}</span>
                       </div>
                     ))}
                   </div>
