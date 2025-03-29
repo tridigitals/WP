@@ -45,11 +45,11 @@ tambahkan unit test di setiap fitur
 - [x] Permission management
 
 ### Post Management
-- [ ] CRUD operations
-- [ ] Draft & publish workflow
-- [ ] Featured image handling
-- [ ] Rich text editor integration
-- [ ] Post meta handling
+- [x] CRUD operations
+- [x] Draft & publish workflow
+- [x] Featured image handling
+- [x] Rich text editor integration
+- [x] Post meta handling
 
 ### Category & Tag Management
 - [x] CRUD operations
